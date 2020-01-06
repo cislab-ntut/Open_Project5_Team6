@@ -66,6 +66,56 @@ GCN包含多層graph convolution，與Perceptron(認知器演算法)相似，但
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_1.PNG)
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_2.PNG)
 
+### 3.3 Temporal Modeling
+金融數據在它原來的性質上本來就具有時間性，這是因爲交易是有時間戳記的。隨著系統不斷的持續進化，我們可以很合理的去假設存在著某種動力，儘管它是隱藏起來(或是難以觀察出來)的。如果一個預測模型是以捕捉動態的方式設計的，那麼它將更加有用。這樣，在預先給定好時間的訓練模型，可以更好地推廣到後續發展。模型捕捉到的系統動力越好，其所能進入的視界就越長。
+
+一般用來擴展GCN的時間模型是使用EvolveGCN [19]，它會爲每個步驟計算單獨的 GCN 模型，然後通過遞歸神經網絡（RNN）將這些GCN連接起來，以捕捉其系統動力。因此，在未來的GCN模型是從過去的模型不斷進化並捕捉其動力演變而來的。
+
+在EvolveGCN中，GCN權重被集體視爲系統狀態。通過使用RNN（例如 GRU)，模型會在每次系統輸入時進行更新。輸入的東西必須是當前時間點的圖形信息，而圖形信息可以多種方式實體化，在EvolveGCN中，它用圖中top-k 個有影響的節點的嵌入來表示。
+
+#### 3.3.1 循環神經網路(Recurrent Neural Network, RNN)
+如果要建立一個語言的相關模型，必須要能夠考慮上下文的關係，因此，有學者提出『循環神經網路』(Recurrent Neural Network, RNN)演算法，它是『自然語言處理』領域最常使用的 Neural Network 模型，簡單的RNN模型(Vanilla RNN)額外考慮前文的關係，把簡單迴歸的模型 (y=W*x+b)，改為下列公式，其中h就是預測值(y)，同樣，將它加一個 Activation Function(通常使用 tanh)，就變成第二個公式：
+![image alt](https://ithelp.ithome.com.tw/upload/images/20171210/20001976JvMnANowAr.jpg)
+![image alt](https://ithelp.ithome.com.tw/upload/images/20171210/20001976JwABjxzSAr.jpg)
+![image alt](https://i.imgur.com/x320pk6.png)
+▲此圖為RNN示意圖
+
+#### 3.3.2 GRU 門控循環單元(Gated Recurrent Unit)
+GRU是循環神經網絡的一種，是為了解決長期記憶和反向傳播中的梯度等問題而提出來的。
+
+為了解決標準RNN的梯度消失問題，GRU使用了更新門（update gate）與重置門（reset gate）。 這兩個門控機制的特殊之處在於，它們能夠保存長期序列中的信息，並且不會隨時間而清除或因為與預測不相關而可移除。
+
+以下展示了個別門控循環單元的具體結構
+![image alt](https://i.imgur.com/k7xSKwk.jpg)
+下面是指引符號
+![image alt](https://i.imgur.com/Cyu8PJI.jpg)
+1.更新門
+在時間為t時，需要下列公式計算更新門z_t
+![image alt](https://i.imgur.com/XzuRzxF.jpg)
+其中x_t為第t個時間步的輸入向量，即輸入序列X的第t個分量，它會經過一個線性變換（與權重矩陣W（z）相乘）。h_（t-1）保存的是前一個時間步t-1的信息，它也同樣經過一個線性變換。更新門將兩個部分信息相加並存到Sigmoid激活函數中，因此將激活結果壓縮到0到1之間。以下是更新門在整個單元的位置與表示方法。
+![image alt](https://i.imgur.com/RZeT6xE.jpg)
+2.重置門
+重置門主要決定了到底有多少過去的信息需要遺忘，我們可以使用以下公式表達：
+![image alt](https://i.imgur.com/L9RTDl0.jpg)
+這個公式和更新門的是一樣的，只是線性變換的參數和用處不同而已，下圖展示出運算過程的表示方式。
+![image alt](https://i.imgur.com/bI2vKr8.jpg)
+3.當前記憶內容
+在重置門的使用中，新的記憶內容將使用重置門存儲過去相關的信息，它的公式為：
+![image alt](https://i.imgur.com/93MKjaZ.jpg)
+輸入x_t與上一時間步信息h_（t-1）先通過一個線性變換，即分別右乘矩陣W和U。
+
+計算重置門r_t與Uh_（t-1）的Hadamard乘積，即r_t與Uh_（t-1）的對應元素乘積。因為前面計算的重置門是一個由0到1組成的向量，它會衡量門控開啟的大小。例如某個元素對應的門控比例為0，那麼它就代表這個元素的信息完全被遺忘掉了。該Hadamard乘積將確定所要保留與遺忘的以前的信息。
+將這兩部分的計算結果相加再補充雙曲正切激活函數中。該計算過程可表示為：
+![image alt](https://i.imgur.com/ebFWYlm.jpg)
+4.當前時間的最終記憶
+在最後一步，網絡需要計算h_t，該向量將保留當前單元的信息並傳遞到下一個單元中。在這個過程中，我們需要使用更新門，它決定了當前記憶內容h'_t和前一時間步 h_（t-1）中需要收集的信息是什麼。這一過程可以表示為：
+![image alt](https://i.imgur.com/Se2V31I.jpg)
+z_t為更新門的激活結果，它同樣以門控的形式控制了信息的流入。
+z_t與h_（t-1）的Hadamard乘積表示前一時間步保留到最終記憶的信息，該信息加上當前記憶保留至最終記憶的信息就等於最終門控循環單元輸出的內容。
+以上表達式可以展示為：
+![image alt](https://i.imgur.com/QGbqP3Q.jpg)
+由上述步驟可以知道門控循環單元不會隨時間而清除以前的信息，它會保留相關的信息並傳遞到下一個單元，因此它利用了全部信息而避免了梯度消失問題。
+
 ## 4. Experiments
 
 以下是用Elliptic Data Set的實驗結果，訓練和測試資料以7:3的比例切分。
