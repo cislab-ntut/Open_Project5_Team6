@@ -10,6 +10,10 @@ Elliptic Data Set中特徵分成兩種：
 
 聚合特徵的加入可以改善效能；但是將purely feature-based method拓展至immediate neighbourhood的實現有一定挑戰性，促使Graph Convolutional Networks的應用。
 ### 3.2 GCN
+GCN包含多層graph convolution，與Perceptron(認知器演算法)相似，但多了由spectral convolution激發 neighbourhood aggregation的步驟。
+假設Elliptic Data Set的比特幣交易圖為G=(N,E)
+* N：交易節點的集合
+* E：BTC flow 的 edges集合
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_1.PNG)
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_2.PNG)
 
