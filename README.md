@@ -36,7 +36,7 @@ Elliptic Data Set將比特幣交易分成兩個類別，合法類別及非法類
 
 每個time step的節點數在時間上相當均勻(從1000到8000個節點不等)。如圖一。
 
-![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/2-1-3.)
+![image]https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/2-1-3.jpg)
 ▲圖一 (上)數據集中不同段時間的非法節點數和合法節點數的比(下)節點數與time step的關係
 
 ### 2.2 Notes on Feature Construction
