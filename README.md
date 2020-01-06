@@ -14,6 +14,7 @@ GCN包含多層graph convolution，與Perceptron(認知器演算法)相似，但
 假設Elliptic Data Set的比特幣交易圖為G=(N,E)
 * N：交易節點的集合
 * E：BTC flow 的 edges集合
+#### 3.2.1 GCN layer
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_1.PNG)
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_2.PNG)
 
