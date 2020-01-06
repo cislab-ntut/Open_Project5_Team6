@@ -86,10 +86,15 @@ GRU是循環神經網絡的一種，是為了解決長期記憶和反向傳播�
 為了解決標準RNN的梯度消失問題，GRU使用了更新門（update gate）與重置門（reset gate）。 這兩個門控機制的特殊之處在於，它們能夠保存長期序列中的信息，並且不會隨時間而清除或因為與預測不相關而可移除。
 
 以下展示了個別門控循環單元的具體結構
+
 ![image alt](https://i.imgur.com/k7xSKwk.jpg)
+
 下面是指引符號
+
 ![image alt](https://i.imgur.com/Cyu8PJI.jpg)
+
 1.更新門
+
 在時間為t時，需要下列公式計算更新門z_t
 ![image alt](https://i.imgur.com/XzuRzxF.jpg)
 
