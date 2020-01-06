@@ -66,3 +66,46 @@ GCN包含多層graph convolution，與Perceptron(認知器演算法)相似，但
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_1.PNG)
 ![image](https://github.com/cislab-yzu/Project6-5_Open/blob/master/%E8%AA%AA%E6%98%8E%E5%9C%96%E7%89%87/3_2_2.PNG)
 
+## 4. Experiments
+
+以下是用Elliptic Data Set的實驗結果，訓練和測試資料以7:3的比例切分。
+
+用測試合法/非法的預測分類模型：
+ - Logistic Regression
+ - 隨機森林
+ - Multilayer Perceptron
+
+
+MLP中一個隱藏層，由50個神經員組成，訓練200 epoch，learning rate為1。
+使用166個特徵及94個局部特徵來評估模型(如下表)
+![image](https://i.imgur.com/NT60RMx.jpg)
+```
+上半：沒有利用graph structure information的結果，每個模型都顯示了具有不同輸入的結果：AF->所有特徵，LF->局部特徵，NE->由GCN計算的節點embeddings。
+下半：使用GCN的結果
+```
+
+三種模型中，聚合的信息的準確性較高，解釋了graph structure information的重要。作者將從GCN獲得的節點嵌入與原始特徵X連接起來。結果增強的特徵集提高了全特徵（AF + N E）和局部特徵（LF + N E）模型的精度。
+
+下表比較了非時態GCN和時態EvolveGCN的預測性能。結果顯示 EvolveGCN的性能優於GCN，進一步研究的方法是使用其他形式的系統輸入來驅動GRU內部的重複更新。
+
+![image](https://i.imgur.com/5QqF3sk.png)
+```
+GCN v.s. EvolveGCN
+```
+![image](https://i.imgur.com/mmMN4mX.png)
+
+黑市關閉：反洗錢的一個重要考慮因素是預測模型對新出現事件而呈現出的穩健性。這一數據集的一個有趣方面，是在數據的時間跨度內有一個黑市突然被關閉。如上圖所示，此事件導致所有方法在黑市關閉後的表現都出現了不佳的情況。即使是一個隨機森林模型，在每一個測試時間步長後重新訓練，假設每次測試後都能獲得真實的信息，也無法可靠地捕獲黑市關閉後新的非法交易。對於此類事件的穩健性，是需要解決的重大挑戰。
+
+
+## 5. Discussion
+隨機森林方法顯著的優於Logistic Regression方法，也優於有graph structure information的GCN。
+* 隨機森林使用投票的機制，對數個決策數的預測結果進行訓練。
+* GCN則和大多數深度學習模型一樣，使用Logistic Regression最為最後的輸出層。
+
+
+問題：
+能否將隨機森林與graph neural network?
+在運行隨機森林前，用GCN計算的embeddings增加節點的特徵，但沒什麼顯著效果。
+利用feedforward neural network的節點進行參數化，將隨機森林和神經網路結合在一起，但沒建議如何整合資訊。
+未來作者將會用別的決策樹替換GCN的Logistic Regression輸出層，進而實現end-to-end的訓練。
+
