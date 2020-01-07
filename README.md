@@ -173,3 +173,8 @@ GCN v.s. EvolveGCN
 利用feedforward neural network的節點進行參數化，將隨機森林和神經網路結合在一起，但沒建議如何整合資訊。
 未來作者將會用別的決策樹替換GCN的Logistic Regression輸出層，進而實現end-to-end的訓練。
 
+
+## 6. Graph Visualization
+自製chronograph，edge表示金流，node表示transactions，紅色違法，藍色不違法，沒顏色則不知道。
+視覺化圖為向量空間中的投影，並有互動設計，可拖動bar依據時間選擇render的點，點選某交易點，與其有交易的周圍edge,node呈現綠色。
+![](https://i.imgur.com/5UMejPg.jpg)
